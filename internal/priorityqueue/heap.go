@@ -40,7 +40,7 @@ func (h *heap[T]) insert(item T) {
 }
 
 func (h *heap[T]) remove() (T, bool) {
-    if h.size == 0 {
+    if h.isEmpty() {
         return *new(T), false
     }
     item := h.arr[0]
@@ -48,6 +48,17 @@ func (h *heap[T]) remove() (T, bool) {
     h.size = h.size - 1
     h.heapify(0)
     return item, true
+}
+
+func (h *heap[T]) peek() (T, bool) {
+    if h.isEmpty() {
+        return *new(T), false
+    }
+    return h.arr[0], true
+}
+
+func (h *heap[T]) isEmpty() bool {
+    return h.size == 0
 }
 
 func (h *heap[T]) heapify (index int) {
