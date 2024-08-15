@@ -27,5 +27,5 @@ func (pq *PriorityQueue[T]) IsEmpty() bool {
 }
 
 func (pq *PriorityQueue[T]) Len() int {
-    return pq.h.length()
+	return pq.h.length()
 }

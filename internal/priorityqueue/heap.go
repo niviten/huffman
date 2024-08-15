@@ -62,7 +62,7 @@ func (h *heap[T]) isEmpty() bool {
 }
 
 func (h *heap[T]) length() int {
-    return h.size
+	return h.size
 }
 
 func (h *heap[T]) heapify(index int) {
