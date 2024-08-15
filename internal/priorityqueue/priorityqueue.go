@@ -25,3 +25,7 @@ func (pq *PriorityQueue[T]) Peek() (T, bool) {
 func (pq *PriorityQueue[T]) IsEmpty() bool {
 	return pq.h.isEmpty()
 }
+
+func (pq *PriorityQueue[T]) Len() int {
+    return pq.h.length()
+}

@@ -61,6 +61,10 @@ func (h *heap[T]) isEmpty() bool {
 	return h.size == 0
 }
 
+func (h *heap[T]) length() int {
+    return h.size
+}
+
 func (h *heap[T]) heapify(index int) {
 	left := leftChildIndex(index)
 	right := rightChildIndex(index)
