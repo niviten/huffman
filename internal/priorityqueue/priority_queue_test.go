@@ -17,11 +17,11 @@ func (ti testItem) CompareTo(other testItem) int {
 	return 0
 }
 
-func TestPriorityQueueInsertAddsFirstItem(t *testing.T) {
+func TestPriorityQueuePushAddsFirstItem(t *testing.T) {
 	pq := New[testItem]()
 	first := testItem{priority: 42, id: 1}
 
-	pq.Insert(first)
+	pq.Push(first)
 
 	if pq.size != 1 {
 		t.Fatalf("size = %d, want 1", pq.size)
@@ -38,7 +38,7 @@ func TestPriorityQueueInsertAddsFirstItem(t *testing.T) {
 	assertHeapProperty(t, pq)
 }
 
-func TestPriorityQueueInsertBubblesHigherPriorityUpMultipleLevels(t *testing.T) {
+func TestPriorityQueuePushBubblesHigherPriorityUpMultipleLevels(t *testing.T) {
 	pq := New[testItem]()
 	input := []testItem{
 		{priority: 1, id: 1},
@@ -48,7 +48,7 @@ func TestPriorityQueueInsertBubblesHigherPriorityUpMultipleLevels(t *testing.T) 
 		{priority: 5, id: 5},
 	}
 
-	insertItems(pq, input...)
+	pushItems(pq, input...)
 
 	expected := []testItem{
 		{priority: 5, id: 5},
@@ -61,20 +61,20 @@ func TestPriorityQueueInsertBubblesHigherPriorityUpMultipleLevels(t *testing.T) 
 	assertHeapProperty(t, pq)
 }
 
-func TestPriorityQueueInsertDoesNotBubbleEqualPriorityAboveParent(t *testing.T) {
+func TestPriorityQueuePushDoesNotBubbleEqualPriorityAboveParent(t *testing.T) {
 	pq := New[testItem]()
 	first := testItem{priority: 10, id: 1}
 	lower := testItem{priority: 5, id: 2}
 	equal := testItem{priority: 10, id: 3}
 
-	insertItems(pq, first, lower, equal)
+	pushItems(pq, first, lower, equal)
 
 	expected := []testItem{first, lower, equal}
 	assertHeapItems(t, pq, expected)
 	assertHeapProperty(t, pq)
 }
 
-func TestPriorityQueueInsertHandlesZeroAndNegativePriorities(t *testing.T) {
+func TestPriorityQueuePushHandlesZeroAndNegativePriorities(t *testing.T) {
 	pq := New[testItem]()
 	input := []testItem{
 		{priority: -10, id: 1},
@@ -83,7 +83,7 @@ func TestPriorityQueueInsertHandlesZeroAndNegativePriorities(t *testing.T) {
 		{priority: -1, id: 4},
 	}
 
-	insertItems(pq, input...)
+	pushItems(pq, input...)
 
 	if pq.arr[0] != (testItem{priority: 0, id: 2}) {
 		t.Fatalf("root = %+v, want priority 0 item", pq.arr[0])
@@ -92,14 +92,14 @@ func TestPriorityQueueInsertHandlesZeroAndNegativePriorities(t *testing.T) {
 	assertHeapProperty(t, pq)
 }
 
-func TestPriorityQueueInsertGrowsWhenCapacityIsReached(t *testing.T) {
+func TestPriorityQueuePushGrowsWhenCapacityIsReached(t *testing.T) {
 	pq := New[testItem]()
-	inserted := make([]testItem, 0, InitCapacity+1)
+	pushed := make([]testItem, 0, InitCapacity+1)
 
 	for i := 0; i < InitCapacity; i++ {
 		item := testItem{priority: i, id: i}
-		inserted = append(inserted, item)
-		pq.Insert(item)
+		pushed = append(pushed, item)
+		pq.Push(item)
 	}
 
 	if pq.size != InitCapacity {
@@ -113,8 +113,8 @@ func TestPriorityQueueInsertGrowsWhenCapacityIsReached(t *testing.T) {
 	}
 
 	highest := testItem{priority: InitCapacity + 1, id: InitCapacity + 1}
-	inserted = append(inserted, highest)
-	pq.Insert(highest)
+	pushed = append(pushed, highest)
+	pq.Push(highest)
 
 	if pq.size != InitCapacity+1 {
 		t.Fatalf("size after growth = %d, want %d", pq.size, InitCapacity+1)
@@ -128,13 +128,13 @@ func TestPriorityQueueInsertGrowsWhenCapacityIsReached(t *testing.T) {
 	if pq.arr[0] != highest {
 		t.Fatalf("root after growth = %+v, want %+v", pq.arr[0], highest)
 	}
-	assertContainsItems(t, pq, inserted)
+	assertContainsItems(t, pq, pushed)
 	assertHeapProperty(t, pq)
 }
 
-func insertItems(pq *PriorityQueue[testItem], items ...testItem) {
+func pushItems(pq *PriorityQueue[testItem], items ...testItem) {
 	for _, item := range items {
-		pq.Insert(item)
+		pq.Push(item)
 	}
 }
 

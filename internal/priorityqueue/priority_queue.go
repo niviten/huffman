@@ -16,7 +16,7 @@ func New[T Comparable[T]]() *PriorityQueue[T] {
 	}
 }
 
-func (pq *PriorityQueue[T]) Insert(item T) {
+func (pq *PriorityQueue[T]) Push(item T) {
 	if pq.size == pq.capacity {
 		pq.capacity = pq.capacity * 2
 		newArr := make([]T, pq.capacity)
