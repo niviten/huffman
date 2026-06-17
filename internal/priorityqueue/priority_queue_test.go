@@ -132,6 +132,158 @@ func TestPriorityQueuePushGrowsWhenCapacityIsReached(t *testing.T) {
 	assertHeapProperty(t, pq)
 }
 
+func TestPriorityQueueIsEmptyReportsQueueState(t *testing.T) {
+	pq := New[testItem]()
+
+	if !pq.IsEmpty() {
+		t.Fatal("IsEmpty() = false, want true for new queue")
+	}
+
+	pq.Push(testItem{priority: 1, id: 1})
+
+	if pq.IsEmpty() {
+		t.Fatal("IsEmpty() = true, want false after Push")
+	}
+}
+
+func TestPriorityQueueLenReportsNumberOfItems(t *testing.T) {
+	pq := New[testItem]()
+
+	if pq.Len() != 0 {
+		t.Fatalf("Len() = %d, want 0 for new queue", pq.Len())
+	}
+
+	input := []testItem{
+		{priority: 1, id: 1},
+		{priority: 3, id: 2},
+		{priority: 2, id: 3},
+	}
+	for i, item := range input {
+		pq.Push(item)
+		if pq.Len() != i+1 {
+			t.Fatalf("Len() after %d pushes = %d, want %d", i+1, pq.Len(), i+1)
+		}
+	}
+}
+
+func TestPriorityQueuePeekReturnsFalseWhenEmpty(t *testing.T) {
+	pq := New[testItem]()
+
+	got, ok := pq.Peek()
+
+	if ok {
+		t.Fatal("Peek() ok = true, want false for empty queue")
+	}
+	if got != (testItem{}) {
+		t.Fatalf("Peek() item = %+v, want zero value", got)
+	}
+}
+
+func TestPriorityQueuePeekReturnsHighestPriorityWithoutRemoving(t *testing.T) {
+	pq := New[testItem]()
+	highest := testItem{priority: 10, id: 2}
+	pushItems(
+		pq,
+		testItem{priority: 1, id: 1},
+		highest,
+		testItem{priority: 5, id: 3},
+	)
+
+	got, ok := pq.Peek()
+
+	if !ok {
+		t.Fatal("Peek() ok = false, want true")
+	}
+	if got != highest {
+		t.Fatalf("Peek() item = %+v, want %+v", got, highest)
+	}
+	if pq.Len() != 3 {
+		t.Fatalf("Len() after Peek() = %d, want 3", pq.Len())
+	}
+	if pq.IsEmpty() {
+		t.Fatal("IsEmpty() after Peek() = true, want false")
+	}
+	assertHeapProperty(t, pq)
+}
+
+func TestPriorityQueuePopReturnsFalseWhenEmpty(t *testing.T) {
+	pq := New[testItem]()
+
+	got, ok := pq.Pop()
+
+	if ok {
+		t.Fatal("Pop() ok = true, want false for empty queue")
+	}
+	if got != (testItem{}) {
+		t.Fatalf("Pop() item = %+v, want zero value", got)
+	}
+	if pq.Len() != 0 {
+		t.Fatalf("Len() after empty Pop() = %d, want 0", pq.Len())
+	}
+	if !pq.IsEmpty() {
+		t.Fatal("IsEmpty() after empty Pop() = false, want true")
+	}
+}
+
+func TestPriorityQueuePopRemovesSingleItem(t *testing.T) {
+	pq := New[testItem]()
+	item := testItem{priority: 42, id: 1}
+	pq.Push(item)
+
+	got, ok := pq.Pop()
+
+	if !ok {
+		t.Fatal("Pop() ok = false, want true")
+	}
+	if got != item {
+		t.Fatalf("Pop() item = %+v, want %+v", got, item)
+	}
+	if pq.Len() != 0 {
+		t.Fatalf("Len() after Pop() = %d, want 0", pq.Len())
+	}
+	if !pq.IsEmpty() {
+		t.Fatal("IsEmpty() after Pop() = false, want true")
+	}
+}
+
+func TestPriorityQueuePopReturnsItemsByDescendingPriority(t *testing.T) {
+	pq := New[testItem]()
+	input := []testItem{
+		{priority: 3, id: 1},
+		{priority: 10, id: 2},
+		{priority: -1, id: 3},
+		{priority: 7, id: 4},
+		{priority: 0, id: 5},
+	}
+	expected := []testItem{
+		{priority: 10, id: 2},
+		{priority: 7, id: 4},
+		{priority: 3, id: 1},
+		{priority: 0, id: 5},
+		{priority: -1, id: 3},
+	}
+
+	pushItems(pq, input...)
+
+	for i, want := range expected {
+		got, ok := pq.Pop()
+		if !ok {
+			t.Fatalf("Pop() #%d ok = false, want true", i+1)
+		}
+		if got != want {
+			t.Fatalf("Pop() #%d item = %+v, want %+v", i+1, got, want)
+		}
+		if pq.Len() != len(expected)-i-1 {
+			t.Fatalf("Len() after Pop() #%d = %d, want %d", i+1, pq.Len(), len(expected)-i-1)
+		}
+		assertHeapProperty(t, pq)
+	}
+
+	if !pq.IsEmpty() {
+		t.Fatal("IsEmpty() after popping all items = false, want true")
+	}
+}
+
 func pushItems(pq *PriorityQueue[testItem], items ...testItem) {
 	for _, item := range items {
 		pq.Push(item)
