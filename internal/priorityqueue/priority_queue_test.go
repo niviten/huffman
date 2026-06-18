@@ -17,6 +17,20 @@ func (ti testItem) CompareTo(other testItem) int {
 	return 0
 }
 
+func TestPriorityQueuePush(t *testing.T) {
+	inputs := [][][2]int{
+		{{2, 2}, {4, 4}, {3, 3}, {1, 1}, {5, 5}},
+	}
+
+	for _, inputItems := range inputs {
+		pq := New[testItem]()
+		for _, input := range inputItems {
+			pq.Push(testItem{priority: input[0], id: input[1]})
+		}
+		assertHeapProperty(t, pq)
+	}
+}
+
 func TestPriorityQueuePushAddsFirstItem(t *testing.T) {
 	pq := New[testItem]()
 	first := testItem{priority: 42, id: 1}

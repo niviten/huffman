@@ -50,7 +50,7 @@ func (pq *PriorityQueue[T]) Pop() (T, bool) {
 	item := pq.arr[0]
 	pq.arr[0] = pq.arr[pq.size-1]
 	pq.size = pq.size - 1
-	heapifyDown(pq.arr, 0, pq.size-1)
+	heapifyDown(pq.arr, 0, pq.size)
 	return item, true
 }
 
@@ -78,10 +78,10 @@ func heapifyDown[T Comparable[T]](arr []T, idx int, size int) {
 
 	highPriorityIdx := idx
 
-	if arr[highPriorityIdx].CompareTo(arr[leftIdx]) <= 0 {
+	if leftIdx < size && arr[highPriorityIdx].CompareTo(arr[leftIdx]) <= 0 {
 		highPriorityIdx = leftIdx
 	}
-	if arr[highPriorityIdx].CompareTo(arr[rightIdx]) <= 0 {
+	if rightIdx < size && arr[highPriorityIdx].CompareTo(arr[rightIdx]) <= 0 {
 		highPriorityIdx = rightIdx
 	}
 
